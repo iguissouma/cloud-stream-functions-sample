@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: 'cloud-stream-functions-sample'
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    stream:
+      function:
+        definition: 'simpleConsumer1;simpleConsumer2'
+        routing:
+          enabled: true
+        bindings:
+          simpleConsumer1-in-0: 'consumer1'
+          simpleConsumer2-in-0: 'consumer2'
+      binders:
+        rabbit:
+          type: 'rabbit'
+          environment:
+            spring:
+              rabbitmq:
+                addresses: 'localhost:5672'
+                username: 'guest'
+                password: 'guest'
+                virtual-host: '/'
+      bindings:
+        consumer1:
+          binder: 'rabbit'
+          group: 'ha_consumer_queue'
+          destination: 'ha_consumer_exchange'
+          consumer:
+            concurrency: 1
+        consumer2:
+          binder: 'rabbit'
+          group: 'ha_consumer_queue'
+          destination: 'ha_consumer_exchange'
+          consumer:
+            concurrency: 1
+      rabbit:
+        bindings:
+          consumer1:
+            consumer:
+              exchange-type: fanout
+              bind-queue: true
+              declare-exchange: true
+              max-concurrency: 1
+              queue-name-group-only: true
+          consumer2:
+            consumer:
+              exchange-type: fanout
+              bind-queue: true
+              declare-exchange: true
+              max-concurrency: 1
+              queue-name-group-only: true
+  devtools:
+    restart:
+      log-condition-evaluation-delta: false
+  jackson:
+    serialization.write-dates-as-timestamps: false
+  sleuth:
+    messaging:
+      enabled: false
+
+management:
+  health:
+    binders:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.sleuth: debug
