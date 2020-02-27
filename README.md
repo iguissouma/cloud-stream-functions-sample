@@ -15,5 +15,5 @@ docker-compose up
 
 3. Run the Main class
 ``` 
-./gradlew bootRun --args='--spring.profiles.active=routing'
+./gradlew bootRun
 ``` 
